@@ -1,14 +1,11 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 using MiddlewareAuth;
 using MiddlewareAuth.Models;
 
 namespace MomoApi.CustomMiddleware
 {
-	public class MerchantValidationMiddleware
+    public class MerchantValidationMiddleware
 	{
         private readonly RequestDelegate next;
         private readonly IMerchantValidation _merchantValidation;
@@ -25,7 +22,9 @@ namespace MomoApi.CustomMiddleware
             string clientIpAddress = context.Connection.RemoteIpAddress.ToString();
             // Get the client auth from the request
             string authParameter = context.Request.Headers.Authorization.ToString();
-            var merchant = _merchantValidation.IsUserAuthorized(authParameter, clientIpAddress);
+            var endpoint = context.GetEndpoint();
+
+            var merchant = _merchantValidation.IsUserAuthorized(authParameter, clientIpAddress, endpoint.DisplayName);
             if (string.IsNullOrEmpty(merchant))
             {
                 await EndRequest(context);
@@ -39,7 +38,6 @@ namespace MomoApi.CustomMiddleware
                 }
                 else
                 {
-                    var endpoint = context.GetEndpoint();
                     string requestBody;
                     if (endpoint.DisplayName.Equals("transfer",StringComparison.OrdinalIgnoreCase))
                     {
@@ -54,13 +52,12 @@ namespace MomoApi.CustomMiddleware
                         }
                         else
                         {
-                            _merchantValidation.ValidateTransfer(transferParam, merchant);
+                            // Continue to the next middleware in the pipeline
+                            await next(context);
                         }
 
                     }
                 }
-                // Continue to the next middleware in the pipeline
-                await next(context);
             }
         }
 
@@ -71,18 +68,6 @@ namespace MomoApi.CustomMiddleware
             response.message = "UNAUTHORIZED";
             response.code = 401;
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsJsonAsync(response);
-        }
-
-        private static async Task EndTransferRequest(HttpContext context, TransferFundResponse response)
-        {
-            // Return an unauthorized / forbidden response if the check is not valid
-            await context.Response.WriteAsJsonAsync(response);
-        }
-
-        private static async Task EndTransferResponseRequest(HttpContext context, transferResponse response)
-        {
-            // Return an unauthorized / forbidden response if the check is not valid
             await context.Response.WriteAsJsonAsync(response);
         }
 
