@@ -11,18 +11,24 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.14" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="MySql.Data" Version="8.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="CustomMiddleware\" />
     <None Remove="Services\" />
+    <None Remove="Utils\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CustomMiddleware\" />
     <Folder Include="Services\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MiddlewareAuth\MiddlewareAuth.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\MiddlewareAuth.Models\MiddlewareAuth.Models.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

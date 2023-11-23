@@ -1,5 +1,6 @@
 ﻿
 using MiddlewareAuth;
+using MomoApi.CustomMiddleware;
 
 namespace MomoApi;
 
@@ -31,7 +32,7 @@ public class Program
 
         app.UseAuthorization();
 
-        app.UseMiddleware<IMerchantValidation>();
+        app.UseMiddleware<MerchantValidationMiddleware>();
 
         app.MapControllers();
 

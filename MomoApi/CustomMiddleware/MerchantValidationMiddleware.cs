@@ -22,9 +22,9 @@ namespace MomoApi.CustomMiddleware
             string clientIpAddress = context.Connection.RemoteIpAddress.ToString();
             // Get the client auth from the request
             string authParameter = context.Request.Headers.Authorization.ToString();
-            var endpoint = context.GetEndpoint();
+            var endpoint = context.Request.Path.HasValue ? context.Request.Path.Value : "";
 
-            var merchant = _merchantValidation.IsUserAuthorized(authParameter, clientIpAddress, endpoint.DisplayName);
+            var merchant = _merchantValidation.IsUserAuthorized(authParameter, clientIpAddress, endpoint);
             if (string.IsNullOrEmpty(merchant))
             {
                 await EndRequest(context);
@@ -39,7 +39,7 @@ namespace MomoApi.CustomMiddleware
                 else
                 {
                     string requestBody;
-                    if (endpoint.DisplayName.Equals("transfer",StringComparison.OrdinalIgnoreCase))
+                    if (endpoint.Contains("transfer",StringComparison.OrdinalIgnoreCase))
                     {
                         // Read the request body
                         using StreamReader reader = new(context.Request.Body, Encoding.UTF8);

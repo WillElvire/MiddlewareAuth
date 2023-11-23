@@ -30,6 +30,10 @@ namespace MiddlewareAuth
 
             try
             {
+#if DEBUG
+                return 1;
+#endif
+
                 SqlConnection conn = new SqlConnection(_payoutDBConString);
                 SqlCommand commandSql = new SqlCommand("CheckTransferActive", conn);
                 commandSql.CommandType = CommandType.StoredProcedure;
@@ -68,10 +72,18 @@ namespace MiddlewareAuth
 
         public string GetMerchantAccount(string apiKey, string apiSecret)
         {
+            string merchandID = string.Empty;
+
             if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret))
             {
                 return null;
             }
+
+
+#if DEBUG
+            merchandID = "bankAccountNumber|merchantId|IPAddress|merchantName|api_key|status";
+            return merchandID;
+#endif
 
             try
             {
@@ -91,7 +103,6 @@ namespace MiddlewareAuth
                     return null;
                 }
 
-                string merchandID = string.Empty;
                 while (reader.Read())
                 {
 
@@ -143,6 +154,10 @@ namespace MiddlewareAuth
 
         public string IsUserAuthorized(string authorizationParameterFromHeader, string IncomingRequestIPAddress, string endPoint)
         {
+            if (string.IsNullOrEmpty(authorizationParameterFromHeader))
+            {
+                return null;
+            }
             var decodedAuthenticationToken = Encoding.UTF8.GetString(Convert.FromBase64String(authorizationParameterFromHeader));
             var usernamePasswordArray = decodedAuthenticationToken.Split(':');
             var username = usernamePasswordArray[0];

@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MiddlewareAuth.Models\MiddlewareAuth.Models.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MiddlewareAuth.Models\MiddlewareAuth.Models.csproj" />
   </ItemGroup>
 </Project>
