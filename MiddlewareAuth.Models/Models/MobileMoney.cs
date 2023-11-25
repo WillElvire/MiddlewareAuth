@@ -13,6 +13,8 @@ namespace MiddlewareAuth.Models.Models
             public string description { get; set; }
             public Destination destination { get; set; }
             public string merchantId { get; set; }
+
+            public string requestkey { get; set; }
         }
 
         public class Destination
@@ -160,6 +162,15 @@ namespace MiddlewareAuth.Models.Models
             public int amount { get; set; }
             public MomoPaymentDetail[] payments { get; set; }
 
+        }
+
+        public class BalanceResponse
+        {
+            
+            public string account_number { get; set; }
+
+            public double account_balance { get; set; }
+            public string message { get; set; }
         }
 
         public class MomoPaymentIntentResponse

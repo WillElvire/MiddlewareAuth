@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -16,24 +17,34 @@ namespace MomoApi.Controllers
     public class MomoController : ControllerBase
     {
         private readonly MomoService mobileMoneyService = new MomoService();
+        
+
+        public MomoController() { 
+           
+        }
         [HttpPost]
         [Route("api/momo/transfer")]
-        public TransactionResponse MomoTransferPayOut(MobileMoneyPayload payload)
+        public  TransactionResponse MomoTransferPayOut(MobileMoneyPayload payload) 
+  
         {
+                if (!ModelState.IsValid)
+                {
+                    var errorList = (from item in ModelState.Values
+                                     from error in item.Errors
+                                     select error.ErrorMessage).ToArray();
+                    return  new TransactionResponse() { code = 1010, transactionInfos = null, message = "Invalid Data" };
+                }
 
-            if (!ModelState.IsValid)
-            {
-                var errorList = (from item in ModelState.Values
-                                 from error in item.Errors
-                                 select error.ErrorMessage).ToArray();
-                return new TransactionResponse() { code = 1010, transactionInfos = null, message = "Invalid Data" };
-            }
-
+            
             Utils.Utils.SaveLog("MomoController", "api/momo/transfer", JsonSerializer.Serialize(payload));
             var momoPaymentResponse = mobileMoneyService.MobileMoneyPayOut(payload);
             return new TransactionResponse() { code = 1000, message = momoPaymentResponse.message, transactionInfos = momoPaymentResponse.returnObject };
+           
+            
+           
 
         }
+
 
 
         [HttpPost]
@@ -117,6 +128,27 @@ namespace MomoApi.Controllers
             return new TransactionResponse() { code = 1000, message = momoTransactionByIdResponce.message, transactionInfos = momoTransactionByIdResponce.returnObject };
 
         }
+
+        [HttpGet]
+        [Route("api/checkBalance/{partnerCode}")]
+        public TransactionResponse CheckBalance(string partnerCode)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errorList = (from item in ModelState.Values
+                                 from error in item.Errors
+                                 select error.ErrorMessage).ToArray();
+                return new TransactionResponse() { code = 1010, transactionInfos = null, message = "Invalid Data" };
+            }
+            Utils.Utils.SaveLog("MomoController", "api/checkBalance", "");
+            var momoTransactionByIdResponce = mobileMoneyService.GePartnerBalance(partnerCode);
+
+            return new TransactionResponse() { code = 1000, message = momoTransactionByIdResponce.message, transactionInfos = momoTransactionByIdResponce };
+
+        }
+
+
+
     }
 }
 

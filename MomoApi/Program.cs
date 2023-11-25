@@ -1,6 +1,7 @@
 ﻿
 using MiddlewareAuth;
 using MomoApi.CustomMiddleware;
+using MomoApi.Utils;
 
 namespace MomoApi;
 
@@ -9,6 +10,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        var config = new Configuration();
 
         // Add services to the container.
 
@@ -16,8 +18,9 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddSingleton<IMerchantValidation>(new MerchantValidation("dbconfig"));
-
+        builder.Services.AddSingleton(config);
+        builder.Services.AddSingleton<IMerchantValidation>(new MerchantValidation(config.get("DbString").ToString()));
+        builder.Services.AddHttpContextAccessor();
 
         var app = builder.Build();
 

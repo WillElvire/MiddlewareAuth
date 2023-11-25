@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using MiddlewareAuth.Models;
+using MiddlewareAuth.Models.Models;
+using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
+using static MiddlewareAuth.Models.Models.MobileMoney;
 
 namespace MiddlewareAuth
 {
@@ -21,8 +26,10 @@ namespace MiddlewareAuth
             _payoutDBConString = payoutDBConString;
         }
 
-        public int checkTransferActive(string merchantId)
+        public int checkTransferActive(string merchantId, string endpoint)
         {
+           bool valueExist = false;
+            
             if (string.IsNullOrEmpty(merchantId))
             {
                 return 0;
@@ -31,11 +38,11 @@ namespace MiddlewareAuth
             try
             {
 #if DEBUG
-                return 1;
+                //return 1;
 #endif
 
-                SqlConnection conn = new SqlConnection(_payoutDBConString);
-                SqlCommand commandSql = new SqlCommand("CheckTransferActive", conn);
+                MySqlConnection conn = new MySqlConnection(_payoutDBConString);
+                MySqlCommand commandSql = new MySqlCommand("CheckTransferActive", conn);
                 commandSql.CommandType = CommandType.StoredProcedure;
                 commandSql.Parameters.AddWithValue("@merchantId", merchantId);
                 if (conn.State != ConnectionState.Open)
@@ -43,17 +50,29 @@ namespace MiddlewareAuth
                     conn.Open();
                 }
 
-                SqlDataReader reader = commandSql.ExecuteReader();
+                MySqlDataReader reader = commandSql.ExecuteReader();
                 if (!reader.HasRows)
                 {
                     return 0;
                 }
 
-
-
+                while (reader.Read())
+                {
+                    // Assuming the function returns a single column
+                    ;
+                    if (endpoint.Contains(reader["services"].ToString(), StringComparison.OrdinalIgnoreCase)) {
+                        valueExist = true;
+                        break;
+                    }
+                }
                 reader.Close();
                 conn.Close();
-                return 1;
+                if (valueExist)
+                {
+                    return 1;
+                }
+                return 0;
+
             }
             catch (Exception e)
             {
@@ -81,14 +100,14 @@ namespace MiddlewareAuth
 
 
 #if DEBUG
-            merchandID = "bankAccountNumber|merchantId|IPAddress|merchantName|api_key|status";
-            return merchandID;
+            //merchandID = "bankAccountNumber|merchantId|IPAddress|merchantName|api_key|status";
+            //return merchandID;
 #endif
 
             try
             {
-                SqlConnection conn = new SqlConnection(_payoutDBConString);
-                SqlCommand commandSql = new SqlCommand("GetMerchandDetails", conn);
+                MySqlConnection conn = new MySqlConnection(_payoutDBConString);
+                MySqlCommand commandSql = new MySqlCommand("GetMerchandDetails", conn);
                 commandSql.CommandType = CommandType.StoredProcedure;
                 commandSql.Parameters.AddWithValue("@apikey", apiKey);
                 commandSql.Parameters.AddWithValue("@apisecret", apiSecret);
@@ -97,7 +116,7 @@ namespace MiddlewareAuth
                     conn.Open();
                 }
 
-                SqlDataReader reader = commandSql.ExecuteReader();
+                MySqlDataReader reader = commandSql.ExecuteReader();
                 if (!reader.HasRows)
                 {
                     return null;
@@ -106,11 +125,11 @@ namespace MiddlewareAuth
                 while (reader.Read())
                 {
 
-                    merchandID = reader["bankAccountNumber"].ToString() + "|" + //account_number
-                                 reader["merchantId"].ToString() + "|" + //id
-                                 reader["IPAddress"].ToString() + "|" +
-                                 reader["merchantName"].ToString() + "|" +
-                                 reader["api_key"].ToString() + "|" +
+                    merchandID = reader["partnerAcctNo"].ToString() + "|" + //account_number
+                                 reader["partnerCode"].ToString() + "|" + //id
+                                 reader["ipAddress"].ToString() + "|" +
+                                 reader["partnerName"].ToString() + "|" +
+                                 reader["apiKey"].ToString() + "|" +
                                  //  reader["apiServicesConfig"].ToString() + "|" +
                                  reader["status"].ToString();
                 }
@@ -126,17 +145,17 @@ namespace MiddlewareAuth
             }
         }
 
-        public transferResponse IsServiceActivatedForMerchantNew(string merchant)
+        public Models.transferResponse IsServiceActivatedForMerchantNew(string merchant, string endpoint)
         {
             //extract the merchant Id
             string merchantId = merchant.ToString().Split('|')[1].Trim();
             string merchantName = merchant.ToString().Split('|')[3].Trim();  // Merchant name
 
-            int responseCheck = checkTransferActive(merchantId);
+            int responseCheck = checkTransferActive(merchantId, endpoint);
             if (string.IsNullOrEmpty(responseCheck.ToString()) || responseCheck != 1)
             {
                 //LogHandler.WriteLog("\t|==> CALLING GET BANK LIST \n\t|==> MERCHANT NAME : " + merchantName + " \n\t|==> RESPONSE : SERVICE ACCESS IS NULL", "TRANSFER");
-                return new transferResponse
+                return new Models.transferResponse
                 {
                     code = 401,
                     message = "ERROR_SERVICE_ACCESS",
@@ -144,7 +163,7 @@ namespace MiddlewareAuth
                 };
             }
 
-            return new transferResponse
+            return new Models.transferResponse
             {
                 code = 201,
                 message = "SERVICE ACCESS GRANTED"
@@ -172,7 +191,7 @@ namespace MiddlewareAuth
 
             //  Get Merchant account number and status
             string merchantBankAccountNumber = merchant.Split('|')[0].Trim();
-            string merchantAccountStatus = merchant.Split('|')[6].Trim();
+            string merchantAccountStatus = merchant.Split('|')[5].Trim();
 
             // merchant account status
             if (!string.IsNullOrEmpty(merchantAccountStatus) && merchantAccountStatus == MERCHANT_ACCOUNT_DEACTIVATED)
@@ -235,7 +254,7 @@ namespace MiddlewareAuth
             LogHandler.WriteLog(LogAccessMessage, "ACCESS_LOGS", true);
         }
 
-        public (bool status, transferResponse response) ValidateTransfer(transferRequestToBank requestParam, string merchant)
+        public (bool status, Models.transferResponse response) ValidateTransfer(MobileMoneyPayload requestParam, string merchant)
         {
             string MerchantBankAccount = merchant.Split('|')[0].ToString().Trim(); // Bank Account 
             string MerchantID = merchant.Split('|')[1].ToString().Trim(); // Merchant ID
@@ -247,7 +266,7 @@ namespace MiddlewareAuth
             {
 
                 // check security Key 
-                if (string.IsNullOrEmpty(requestParam.key))
+                if (string.IsNullOrEmpty(requestParam.requestkey))
                 {
                     LogHandler.WriteLog("\t|==> CALLING TRANSFER \n\t|==> MERCHANT NAME : " + merchantName + " \n\t|==> DATA PASSED : " + JsonSerializer.Serialize(requestParam) + " \n\t|==> ERROR : SECURITY FOR TRANSACTION IS NULL OR EMPTY", "TRANSFER");
                     return (false, new TransferFundResponse
@@ -277,16 +296,16 @@ namespace MiddlewareAuth
 
                 // If the hash key provided by merchant is different from the one               
                 string requestDataToBeHashed = merchantAPIKey + "|" +
-                    MerchantID + "|" +
-                    requestParam.sendingAmount.ToString() + "|" +
-                    requestParam.beneficiaryAccountNumber.ToString() + "|" +
-                    requestParam.beneficiaryBankCode.ToString() + "|" +
-                    requestParam.merchantReference.ToString() + "|" +
+                    
+                    requestParam.amount.ToString() + "|" +
+                    requestParam.destination.recipientName.ToString() + "|" +
+                    requestParam.destination.msisdn.ToString() + "|" +
+                    requestParam.reference.ToString() + "|" +
                     DateTime.Now.ToString("yyyy.MM.dd");
 
                 string requestDataHashed = GetHashOf(requestDataToBeHashed);  // we calculate here
 
-                if (!requestDataHashed.ToLower().Equals(requestParam.key.ToLower()))
+                if (!requestDataHashed.ToLower().Equals(requestParam.requestkey.ToLower()))
                 {
                     LogHandler.WriteLog("\t|==> CALLING TRANSFER \n\t|==> MERCHANT NAME : " + merchantName + " \n\t|==> DATA PASSED : " + JsonSerializer.Serialize(requestParam) + " \n\t|==> ERROR : UNABLE TO VALIDATE THE TRANSACTION KEY", "TRANSFER");
                     return (false, new TransferFundResponse()
@@ -296,20 +315,23 @@ namespace MiddlewareAuth
                         description = "UNABLE TO VALIDATE THE TRANSACTION KEY"
                     });
                 }
-                return (true, new transferResponse());
+                return (true, new Models.transferResponse());
             }
             catch (Exception ex)
             {
-                return (false, new transferResponse());
+                return (false, new Models.transferResponse());
             }
         }
+
+
+       
 
         /********************************
  * 
  * COMMON BANK TRANSFER METHODS
  * 
  *******************************/
-        private static string ValidateRequestField(transferRequestToBank requestData, string[] ExcludedField = null)
+        private static string ValidateRequestField(MobileMoneyPayload requestData, string[] ExcludedField = null)
         {
             try
             {

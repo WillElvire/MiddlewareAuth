@@ -1,16 +1,22 @@
 ﻿using System;
 namespace MomoApi.Utils
 {
-	public class Config
-	{
-        public IConfigurationRoot configuration = null;
-        public Config()
-        {
+    public class Configuration
+    {
+        ConfigurationBuilder configurationBuilder;
+        IConfigurationRoot Config;
 
-            configuration = new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory()) // Spécifie le chemin du répertoire actuel
-        .AddJsonFile("appsettings.json") // Charge le fichier appsettings.json
-        .Build();
+        public Configuration()
+        {
+            configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddJsonFile("appsettings.json");
+
+        }
+
+        public string get(string keyName)
+        {
+            Config = configurationBuilder.Build();
+            return Config[keyName];
 
         }
     }

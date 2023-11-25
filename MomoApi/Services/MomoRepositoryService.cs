@@ -4,6 +4,7 @@ using static MiddlewareAuth.Models.Models.MobileMoney;
 using System.Data.SqlClient;
 using System.Text.Json;
 using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace MomoApi.Services
 {
@@ -11,6 +12,12 @@ namespace MomoApi.Services
 	{
         DatabaseConnector databaseConnector = new DatabaseConnector();
         ConfigurationManager configurationManager = new ConfigurationManager();
+        //private readonly IConfiguration _configuration;
+
+        //public MomoRepositoryService(IConfiguration configuration)
+        //{
+        //    _configuration = configuration;
+        //}
         public ReturnMessage addMomoPaymentToDb(MomoPaymentToDb payment)
         {
             string connectionString = databaseConnector.connectionString;
