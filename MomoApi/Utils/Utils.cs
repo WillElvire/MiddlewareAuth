@@ -15,6 +15,9 @@ namespace MomoApi.Utils
 
         public static int SaveLog(string controller, string end_point_name, string data)
         {
+#if DEBUG
+            return 1;
+#endif
             DatabaseConnector databaseConnector = new DatabaseConnector();
 
             databaseConnector.OpenConnection();

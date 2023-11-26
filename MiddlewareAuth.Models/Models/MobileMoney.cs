@@ -1,18 +1,26 @@
 ﻿using System;
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MiddlewareAuth.Models.Models
 {
     public class MobileMoney
     {
+        public MobileMoney()
+        {
+
+        }
+
         public class MobileMoneyPayload
         {
+            [JsonPropertyName("reference")]
+
             public string reference { get; set; }
             public int amount { get; set; }
             public string currency { get; set; }
             public string description { get; set; }
             public Destination destination { get; set; }
-            public string merchantId { get; set; }
+            public string MerchantId { get; set; }
 
             public string requestkey { get; set; }
         }

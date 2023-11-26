@@ -1,0 +1,63 @@
+
+::::::::::::::::::::::::::::::::: LOG ENTRY :::::::::::::::::::::::::::::::::
+26/11/2023 17:58:4
+LOG DETAILS
+	|==> LOG FROM : TRANSFERlogs/26-11-23.txt
+	|==> CALLING TRANSFER 
+	|==> MERCHANT NAME : merchantName 
+	|==> DATA PASSED : {"reference":"akidi transfer","amount":200,"currency":"xof","description":"YOUR_DESCRIPTION","destination":{"type":"mobile_money","country":"CI","recipientName":"Jsohn Doe","msisdn":"0103659060","provider":"orange"},"merchantId":"46","requestkey":"ssss"} 
+	|==> ERROR : UNABLE TO VALIDATE THE TRANSACTION KEY
+
+::::::::::::::::::::::::::::::::: LOG ENTRY :::::::::::::::::::::::::::::::::
+26/11/2023 18:26:28
+LOG DETAILS
+	|==> LOG FROM : TRANSFERlogs/26-11-23.txt
+	|==> CALLING TRANSFER 
+	|==> MERCHANT NAME : merchantName 
+	|==> DATA PASSED : {"reference":"akidi transfer","amount":200,"currency":"xof","description":"YOUR_DESCRIPTION","destination":{"type":"mobile_money","country":"CI","recipientName":"Jsohn Doe","msisdn":"0103659060","provider":"orange"},"merchantId":null,"requestkey":"45EC437FFF593586AD99D3E1974C4B888A09E81831C3471A354F3C2AC9F4113E"} 
+	|==> ERROR : MERCHANTID CANNOT BE EMPTY OR NULL
+
+::::::::::::::::::::::::::::::::: LOG ENTRY :::::::::::::::::::::::::::::::::
+26/11/2023 18:32:36
+LOG DETAILS
+	|==> LOG FROM : TRANSFERlogs/26-11-23.txt
+	|==> CALLING TRANSFER 
+	|==> MERCHANT NAME : merchantName 
+	|==> DATA PASSED : {"reference":null,"amount":200,"currency":null,"description":null,"destination":null,"MerchantId":null,"requestkey":null} 
+	|==> ERROR : SECURITY FOR TRANSACTION IS NULL OR EMPTY
+
+::::::::::::::::::::::::::::::::: LOG ENTRY :::::::::::::::::::::::::::::::::
+26/11/2023 18:32:56
+LOG DETAILS
+	|==> LOG FROM : TRANSFERlogs/26-11-23.txt
+	|==> CALLING TRANSFER 
+	|==> MERCHANT NAME : merchantName 
+	|==> DATA PASSED : {"reference":null,"amount":200,"currency":null,"description":null,"destination":null,"MerchantId":null,"requestkey":"45EC437FFF593586AD99D3E1974C4B888A09E81831C3471A354F3C2AC9F4113E"} 
+	|==> ERROR : REFERENCE, CURRENCY, DESCRIPTION, MERCHANTID CANNOT BE EMPTY OR NULL
+
+::::::::::::::::::::::::::::::::: LOG ENTRY :::::::::::::::::::::::::::::::::
+26/11/2023 18:34:26
+LOG DETAILS
+	|==> LOG FROM : TRANSFERlogs/26-11-23.txt
+	|==> CALLING TRANSFER 
+	|==> MERCHANT NAME : merchantName 
+	|==> DATA PASSED : {"reference":"akidi transfer","amount":0,"currency":"xof","description":"YOUR_DESCRIPTION","destination":{"type":"mobile_money","country":"CI","recipientName":"Jsohn Doe","msisdn":"0103659060","provider":"orange"},"MerchantId":"46","requestkey":"45EC437FFF593586AD99D3E1974C4B888A09E81831C3471A354F3C2AC9F4113E"} 
+	|==> ERROR : AMOUNT CANNOT BE EMPTY OR NULL
+
+::::::::::::::::::::::::::::::::: LOG ENTRY :::::::::::::::::::::::::::::::::
+26/11/2023 18:45:21
+LOG DETAILS
+	|==> LOG FROM : TRANSFERlogs/26-11-23.txt
+	|==> CALLING TRANSFER 
+	|==> MERCHANT NAME : merchantName 
+	|==> DATA PASSED : {"reference":null,"amount":0,"currency":null,"description":null,"destination":null,"MerchantId":null,"requestkey":null} 
+	|==> ERROR : SECURITY FOR TRANSACTION IS NULL OR EMPTY
+
+::::::::::::::::::::::::::::::::: LOG ENTRY :::::::::::::::::::::::::::::::::
+26/11/2023 19:20:36
+LOG DETAILS
+	|==> LOG FROM : TRANSFERlogs/26-11-23.txt
+	|==> CALLING TRANSFER 
+	|==> MERCHANT NAME : merchantName 
+	|==> DATA PASSED : {"reference":"akidi transfer","amount":2,"currency":"xof","description":"YOUR_DESCRIPTION","destination":{"type":"mobile_money","country":"CI","recipientName":"Jsohn Doe","msisdn":"0103659060","provider":"orange"},"MerchantId":"46","requestkey":"45EC437FFF593586AD99D3E1974C4B888A09E81831C3471A354F3C2AC9F4113E"} 
+	|==> ERROR : UNABLE TO VALIDATE THE TRANSACTION KEY

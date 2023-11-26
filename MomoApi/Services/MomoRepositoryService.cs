@@ -90,7 +90,7 @@ namespace MomoApi.Services
                         cmd.Parameters.AddWithValue("@createdAt", transfert.response.createdAt);
                         cmd.Parameters.AddWithValue("@momoTransId", transfert.response.id);
                         cmd.Parameters.AddWithValue("@akidiReference", transfert.akidiReference);
-                        cmd.Parameters.AddWithValue("@merchantId", transfert.request.merchantId);
+                        cmd.Parameters.AddWithValue("@merchantId", transfert.request.MerchantId);
 
 
                         try

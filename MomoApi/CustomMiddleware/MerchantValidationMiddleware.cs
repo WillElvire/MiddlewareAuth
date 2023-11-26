@@ -43,6 +43,8 @@ namespace MomoApi.CustomMiddleware
                     if (endpoint.Contains("momo/transfer", StringComparison.OrdinalIgnoreCase))
                     {
                         // Read the request body
+                        await next(context);
+
                         using StreamReader reader = new(context.Request.Body, Encoding.UTF8);
                         requestBody = await reader.ReadToEndAsync();
                         var transferParam = JsonSerializer.Deserialize<MobileMoneyPayload>(requestBody);

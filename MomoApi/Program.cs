@@ -30,12 +30,12 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+        app.UseMiddleware<MerchantValidationMiddleware>();
 
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
 
-        app.UseMiddleware<MerchantValidationMiddleware>();
 
         app.MapControllers();
 
