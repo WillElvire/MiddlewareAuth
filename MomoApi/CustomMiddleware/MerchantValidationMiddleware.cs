@@ -1,7 +1,9 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using MiddlewareAuth;
 using MiddlewareAuth.Models;
+using Org.BouncyCastle.Asn1.Ocsp;
 using static MiddlewareAuth.Models.Models.MobileMoney;
 
 namespace MomoApi.CustomMiddleware
@@ -39,23 +41,28 @@ namespace MomoApi.CustomMiddleware
                 }
                 else
                 {
-                    string requestBody;
                     if (endpoint.Contains("momo/transfer", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Read the request body
-                        await next(context);
+                        // Read the request bo
+                        var request = context.Request;
 
-                        using StreamReader reader = new(context.Request.Body, Encoding.UTF8);
-                        requestBody = await reader.ReadToEndAsync();
-                        var transferParam = JsonSerializer.Deserialize<MobileMoneyPayload>(requestBody);
+                        request.EnableBuffering();
+                        var buffer = new byte[Convert.ToInt32(request.ContentLength)];
+                        await request.Body.ReadAsync(buffer, 0, buffer.Length);
+                        var requestContent = Encoding.UTF8.GetString(buffer);
+                        var transferParam = JsonSerializer.Deserialize<MobileMoneyPayload>(requestContent);
                         var response = _merchantValidation.ValidateTransfer(transferParam, merchant);
+
                         if (!response.status)
                         {
+                            request.Body.Position = 0;  //rewinding the stream to 0
+
                             await EndAllTransferRequest(context, response.response);
                         }
                         else
                         {
                             // Continue to the next middleware in the pipeline
+                            request.Body.Position = 0;  //rewinding the stream to 0
                             await next(context);
                         }
 
