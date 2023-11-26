@@ -2,6 +2,7 @@
 using System.Text.Json;
 using MiddlewareAuth;
 using MiddlewareAuth.Models;
+using static MiddlewareAuth.Models.Models.MobileMoney;
 
 namespace MomoApi.CustomMiddleware
 {
@@ -31,7 +32,7 @@ namespace MomoApi.CustomMiddleware
             }
             else
             {
-                var serviceActivatedChecking = _merchantValidation.IsServiceActivatedForMerchantNew(merchant);
+                var serviceActivatedChecking = _merchantValidation.IsServiceActivatedForMerchantNew(merchant, endpoint);
                 if (serviceActivatedChecking.code != 201)
                 {
                     await EndAllTransferRequest(context, serviceActivatedChecking);
@@ -39,12 +40,12 @@ namespace MomoApi.CustomMiddleware
                 else
                 {
                     string requestBody;
-                    if (endpoint.Contains("transfer",StringComparison.OrdinalIgnoreCase))
+                    if (endpoint.Contains("momo/transfer", StringComparison.OrdinalIgnoreCase))
                     {
                         // Read the request body
                         using StreamReader reader = new(context.Request.Body, Encoding.UTF8);
                         requestBody = await reader.ReadToEndAsync();
-                        var transferParam = JsonSerializer.Deserialize<transferRequestToBank>(requestBody);
+                        var transferParam = JsonSerializer.Deserialize<MobileMoneyPayload>(requestBody);
                         var response = _merchantValidation.ValidateTransfer(transferParam, merchant);
                         if (!response.status)
                         {
@@ -56,6 +57,10 @@ namespace MomoApi.CustomMiddleware
                             await next(context);
                         }
 
+                    }
+                    else {
+                        // Continue to the next middleware in the pipeline
+                        await next(context);
                     }
                 }
             }

@@ -4,6 +4,9 @@ using static MiddlewareAuth.Models.Models.MobileMoney;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using MySql.Data.MySqlClient;
+using System.Data;
+using MomoApi.Utils;
 
 namespace MomoApi.Services
 {
@@ -14,12 +17,19 @@ namespace MomoApi.Services
         HttpClient client = new HttpClient();
         MomoRepositoryService momoRepository = new MomoRepositoryService();
         ConfigurationManager configurationManager = new ConfigurationManager();
+        Configuration configuration = new Configuration();
+        //private string _payoutDBConString;
 
+        //public MomoService(string payoutDBConString)
+        //{
+        //    _payoutDBConString = payoutDBConString;
+        //}
 
         public MomoService()
         {
-
+            string connectionString = configuration.get("DbString");
         }
+        
 
 
         private string GetProviderCorrectApiPath()
@@ -244,6 +254,68 @@ namespace MomoApi.Services
             dynamic errorResponse = JsonSerializer.Deserialize<dynamic>(responseContent, options);
             LogHandler.WriteLog("\t|==> CALLING  MOBILEMONEYPAYOUT \n\t|==> RESPONSE : " + JsonSerializer.Serialize(errorResponse), "MOBILE MONEY");
             return message;
+
+        }
+
+        public BalanceResponse GePartnerBalance(string partnerCode)
+        {
+
+            BalanceResponse res = new BalanceResponse();
+
+            string partnerbalance = string.Empty;
+            string accNumber = string.Empty;
+            
+
+            if (string.IsNullOrEmpty(partnerCode))
+            {
+                
+                res.message = "Transaction failed";
+                res.account_balance = 0.00;
+                return res;
+            }
+
+
+            try
+            {
+                string payoutDBConString  = configuration.get("DbString").ToString();
+                MySqlConnection conn = new MySqlConnection(payoutDBConString);
+                MySqlCommand commandSql = new MySqlCommand("GetPartnerBalance", conn);
+                commandSql.CommandType = CommandType.StoredProcedure;
+                commandSql.Parameters.AddWithValue("@partnerCode", partnerCode);
+
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                }
+
+                MySqlDataReader reader = commandSql.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    partnerbalance = reader["balance"].ToString();
+                    accNumber = reader["partnerAcctNo"].ToString();
+                    
+                    res.message = "Successful";
+                    res.account_balance = Convert.ToDouble(partnerbalance);
+                    res.account_number = accNumber;
+                     
+                }
+
+
+
+                reader.Close();
+                conn.Close();
+                return res;
+            }
+            catch (Exception e)
+            {
+                LogHandler.WriteLog(e.Message);
+                
+                res.message = "Transaction failed";
+                res.account_balance = 0.00;
+                return res;
+            }
+
+
 
         }
 
