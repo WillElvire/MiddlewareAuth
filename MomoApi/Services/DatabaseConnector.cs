@@ -10,11 +10,12 @@ namespace MomoApi.Services
         public MySqlConnection connection;
         public string connectionString;
 
-        Config config = new Config();
+        Configuration configuration = new Configuration();
+      
 
         public DatabaseConnector()
         {
-            string connectionString = config.configuration.GetConnectionString("akidiCnStr");
+            string connectionString = configuration.get("DbString");
 
             //connectionString = ConfigurationManager.AppSettings["ConString"].ToString();
             connection = new MySqlConnection(connectionString);

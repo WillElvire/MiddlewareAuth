@@ -1,4 +1,5 @@
 ﻿using MiddlewareAuth.Models;
+using static MiddlewareAuth.Models.Models.MobileMoney;
 
 namespace MiddlewareAuth
 {
@@ -10,13 +11,13 @@ namespace MiddlewareAuth
 
         void LogAPIAccessActivity(string merchant, string IncomingRequestIPAddress, string endPoint);
 
-        transferResponse IsServiceActivatedForMerchantNew(string merchant);
+        transferResponse IsServiceActivatedForMerchantNew(string merchant, string endpoint);
 
-        int checkTransferActive(string merchantId);
+        int checkTransferActive(string merchantId, string endpoint);
 
         string GetHashOf(string dataToBeHashed);
 
-        (bool status, transferResponse response) ValidateTransfer(transferRequestToBank requestParam, string merchant);
+        (bool status, transferResponse response) ValidateTransfer(MobileMoneyPayload requestParam, string merchant);
     }
 }
 
