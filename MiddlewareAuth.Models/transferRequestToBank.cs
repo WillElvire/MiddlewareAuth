@@ -1,4 +1,6 @@
 ﻿using System;
+using static MiddlewareAuth.Models.Models.MobileMoney;
+
 namespace MiddlewareAuth.Models
 {
     public class transferRequestToBank
@@ -26,6 +28,14 @@ namespace MiddlewareAuth.Models
         public string remarks { get; set; }
         public string encryptedData { get; set; }      // Mandatory
         public string key { get; set; }      // Mandatory
+
+        public int amount { get; set; }
+        public string description { get; set; }
+        public string merchantId { get; set; }
+        public string requestkey { get; set; }
+        public string reference { get; set; }
+        public string currency { get; set; }
+        public Destination destination { get; set; }
     }
 }
 

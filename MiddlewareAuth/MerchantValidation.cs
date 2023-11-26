@@ -81,7 +81,7 @@ namespace MiddlewareAuth
 
 
 #if DEBUG
-            merchandID = "bankAccountNumber|merchantId|IPAddress|merchantName|api_key|status";
+            merchandID = "bankAccountNumber|merchantId|IPAddress;::1|merchantName|api_key|apiServicesConfig|status";
             return merchandID;
 #endif
 
@@ -158,6 +158,7 @@ namespace MiddlewareAuth
             {
                 return null;
             }
+            authorizationParameterFromHeader = authorizationParameterFromHeader.Replace("Bearer ", "");
             var decodedAuthenticationToken = Encoding.UTF8.GetString(Convert.FromBase64String(authorizationParameterFromHeader));
             var usernamePasswordArray = decodedAuthenticationToken.Split(':');
             var username = usernamePasswordArray[0];
