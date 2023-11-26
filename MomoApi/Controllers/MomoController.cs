@@ -44,7 +44,7 @@ namespace MomoApi.Controllers
 
         [HttpPost]
         [Route("api/momo/payment")]
-        public TransactionResponse MomoPayment(MomoPaymentPayload payload)
+        public TransactionResponse MomoPayment([FromBody] MomoPaymentPayload payload)
         {
 
             if (!ModelState.IsValid)
